@@ -1,0 +1,4 @@
+GET http://localhost:3000/users/435s
+?limit=10
+&offset=20
+
