@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
+// Swagger configuration
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -24,6 +27,32 @@ async function bootstrap() {
     }),
   );
 
+  /**
+   * Swagger configuration
+   */
+  // This builds the configuration object
+  const config = new DocumentBuilder()
+    .setTitle('NestJS Masterclass - Blog App API')
+    .setDescription('Use the base API URL as http://localhost:3000')
+    .setTermsOfService('http://localhost:3000/terms-of-service')
+    .setLicense(
+      'MIT License',
+      'http://github.com/git/git-scm.com/blob/main/MIT-LICENSE.txt',
+    )
+    .addServer('http://localhost:3000')
+    .setVersion('1.0')
+    .build();
+  // Integrate swagger
+  // Instantiate a document object
+  const document = SwaggerModule.createDocument(app, config);
+  // Use the document to complete the setup
+  // This setup method takes minimum of three arguments
+  // 1. Path to the documentation: {base path to the app}/{whatever the path to the documentation} - localhost:3000/api
+  // 2. Application itself
+  // 3. Document object
+  SwaggerModule.setup('api', app, document);
+
   await app.listen(process.env.PORT ?? 3000);
 }
+
 bootstrap();

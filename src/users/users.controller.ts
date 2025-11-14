@@ -16,10 +16,63 @@ import {
 import { CreateUserDto } from './dtos/create-user.fto';
 import { GetUsersParamDto } from './dtos/get-users-param.dto';
 import { PatchUserDto } from './dtos/patch-user.dto';
+import { UsersService } from './providers/users.service';
 // import type { Request } from 'express';
+// To group apis based on the modules - ApiTags
+import { ApiTags, ApiQuery, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('users')
+// A swagger decorator - Swagger decorators can be used within DTOs, controllers and also controller methods
+// This one is used to group the requests based on the modules
+@ApiTags('USERS')
 export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @Get('{/:id}')
+  // Adding a description/summary to the API in swagger documentation
+  @ApiOperation({
+    summary: 'Fetches a list of registered users on the application',
+  })
+  // ApiResponse is for document the api response in swagger documentation
+  @ApiResponse({
+    status: 200,
+    description: 'Users fetched successfully based on the query',
+  })
+  // To display data about query parameters in the swagger documentation
+  @ApiQuery({
+    name: 'limit',
+    type: 'number',
+    required: false,
+    description: 'The number of entries returned per query',
+    example: 10,
+  })
+  @ApiQuery({
+    name: 'page',
+    type: 'number',
+    required: false,
+    description: 'The page number that the API returns',
+    example: 1,
+  })
+  public getUsers(
+    @Param() getUsersParamDto: GetUsersParamDto,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+  ) {
+    return this.usersService.findAll(getUsersParamDto, limit, page);
+  }
+
+  @Post()
+  public createUser(@Body() createUserDto: CreateUserDto) {
+    console.log(typeof createUserDto);
+    console.log(createUserDto instanceof CreateUserDto);
+    return 'You sent a post request to users endpoint!';
+  }
+
+  @Patch()
+  public patchUser(@Body() patchUserDto: PatchUserDto) {
+    return patchUserDto;
+  }
+
   // To get the whole parameter object of the request
   // @Get('/:id{/:optional}')
   // public getUsers(@Param() params: any, @Query() query: any) {
@@ -45,20 +98,21 @@ export class UsersController {
   //   return 'You sent a get request to users endpoint!';
   // }
 
-  @Get('{/:id}')
-  public getUsers(
-    // Once you extract out key-value pair, you cannot validate it with DTOs.
-    // There could be more than one parameters in the request.
-    // So, we have to extract the whole parameter object to validate with DTOs.
-    @Param() getUsersParamDto: GetUsersParamDto,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe)
-    limit: number | undefined,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe)
-    page: number | undefined,
-  ) {
-    console.log(getUsersParamDto);
-    return 'You sent a get request to users endpoint!';
-  }
+  // To validate parameters of the request using DTO and ValidationPipe
+  // @Get('{/:id}')
+  // public getUsers(
+  //   // Once you extract out a key-value pair, you cannot validate it with DTOs.
+  //   // There could be more than one parameters in the request.
+  //   // So, we have to extract the whole parameter object to validate with DTOs.
+  //   @Param() getUsersParamDto: GetUsersParamDto,
+  //   @Query('limit', new DefaultValuePipe(10), ParseIntPipe)
+  //   limit: number | undefined,
+  //   @Query('page', new DefaultValuePipe(1), ParseIntPipe)
+  //   page: number | undefined,
+  // ) {
+  //   console.log(getUsersParamDto);
+  //   return 'You sent a get request to users endpoint!';
+  // }
 
   // To get the whole body of the request
   // @Post()
@@ -89,15 +143,17 @@ export class UsersController {
   //   return 'You sent a post request to users endpoint!';
   // }
 
-  @Post()
-  public createUser(@Body() createUserDto: CreateUserDto) {
-    // console.log(typeof createUserDto);
-    console.log(createUserDto instanceof CreateUserDto);
-    return 'You sent a post request to users endpoint!';
-  }
+  // To validate the body of the request using DTO and ValidationPipe (global pipe)
+  // @Post()
+  // public createUser(@Body() createUserDto: CreateUserDto) {
+  //   console.log(typeof createUserDto);
+  //   console.log(createUserDto instanceof CreateUserDto);
+  //   return 'You sent a post request to users endpoint!';
+  // }
 
-  @Patch()
-  public patchUser(@Body() patchUserDto: PatchUserDto) {
-    return patchUserDto;
-  }
+  // to use partial updates with PATCH method using PatchUserDto (check partial class in the DTO file)
+  // @Patch()
+  // public patchUser(@Body() patchUserDto: PatchUserDto) {
+  //   return patchUserDto;
+  // }
 }
