@@ -1,0 +1,7 @@
+{
+  "project": "nest",
+  "tsconfig": "tsconfig.json",
+  "output": "documentation",
+  "disableSourceCode": true,
+  "hideGenerator": true
+}

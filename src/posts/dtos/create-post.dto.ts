@@ -8,12 +8,13 @@ import {
   IsString,
   IsUrl,
   Matches,
+  MaxLength,
   MinLength,
   ValidateNested,
 } from 'class-validator';
 import { postStatus } from '../enums/postStatus.enum';
 import { postType } from '../enums/postType.enum';
-import { CreatePostMetaOptions } from './create-post-meta-options.dto';
+import { CreatePostMetaOptionsDto } from '../../meta-options/dtos/create-post-meta-options.dto';
 
 // Type decorator does two things.
 // 1. It matches the incoming request to the particular DTO and creates an instance of the particular DTO whenever an incoming request comes in.
@@ -34,6 +35,7 @@ export class CreatePostDto {
   })
   @IsString()
   @MinLength(4)
+  @MaxLength(512)
   @IsNotEmpty()
   title: string;
 
@@ -50,6 +52,7 @@ export class CreatePostDto {
     example: 'my-blog-post',
   })
   @IsString()
+  @MaxLength(256)
   @IsNotEmpty()
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
     message:
@@ -86,6 +89,7 @@ export class CreatePostDto {
     description: 'Featured image for your blog post',
     example: 'http://localhost.com/images/image1.jpg',
   })
+  @MaxLength(1024)
   @IsOptional()
   @IsUrl()
   featuredImageUrl?: string;
@@ -109,29 +113,49 @@ export class CreatePostDto {
   tags?: string[];
 
   // metaOptions?: [{ key: 'some-sidebarEnabled'; value: true }];
-  @ApiPropertyOptional({
-    type: 'array',
-    required: false,
-    items: {
-      type: 'object',
-      properties: {
-        key: {
-          type: 'string',
-          description:
-            'The key can be any string identifier for your meta options',
-          example: 'sidebarEnabled',
-        },
-        value: {
-          type: 'any',
-          description: 'Any value that you want to save to the key',
-          example: true,
-        },
-      },
-    },
-  })
+  // Old way //
+  // @ApiPropertyOptional({
+  //   type: 'array',
+  //   required: false,
+  //   items: {
+  //     type: 'object',
+  //     properties: {
+  //       key: {
+  //         type: 'string',
+  //         description:
+  //           'The key can be any string identifier for your meta options',
+  //         example: 'sidebarEnabled',
+  //       },
+  //       value: {
+  //         type: 'any',
+  //         description: 'Any value that you want to save to the key',
+  //         example: true,
+  //       },
+  //     },
+  //   },
+  // })
+  // @ApiPropertyOptional({
+  //   // type: 'object',
+  //   // required: false,
+  //   // items: {
+  //   //   type: 'object',
+  //   //   properties: {
+  //   //     metaValue: {
+  //   //       type: 'json',
+  //   //       description: 'The metaValue is a JSON string',
+  //   //       example: '{"sidebarEnabled": true}',
+  //   //     },
+  //   //   },
+  //   // },
+  //   type: () => CreatePostMetaOptionsDto,
+  //   description:
+  //     'Meta options as an object containing a metaValue JSON string.',
+  //   example: {
+  //     metaValue: '{"sidebarEnabled": true}',
+  //   },
+  // })
   @IsOptional()
-  @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreatePostMetaOptions)
-  metaOptions?: CreatePostMetaOptions[];
+  @Type(() => CreatePostMetaOptionsDto)
+  metaOptions?: CreatePostMetaOptionsDto | null;
 }

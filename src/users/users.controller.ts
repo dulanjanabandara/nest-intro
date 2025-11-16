@@ -13,7 +13,7 @@ import {
   ValidationPipe,
   Patch,
 } from '@nestjs/common';
-import { CreateUserDto } from './dtos/create-user.fto';
+import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUsersParamDto } from './dtos/get-users-param.dto';
 import { PatchUserDto } from './dtos/patch-user.dto';
 import { UsersService } from './providers/users.service';
@@ -63,9 +63,10 @@ export class UsersController {
 
   @Post()
   public createUser(@Body() createUserDto: CreateUserDto) {
-    console.log(typeof createUserDto);
-    console.log(createUserDto instanceof CreateUserDto);
-    return 'You sent a post request to users endpoint!';
+    return this.usersService.createUser(createUserDto);
+    // console.log(typeof createUserDto);
+    // console.log(createUserDto instanceof CreateUserDto);
+    // return 'You sent a post request to users endpoint!';
   }
 
   @Patch()
