@@ -13,23 +13,24 @@ export class PostsService {
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
     @InjectRepository(MetaOption)
-    private readonly metaOptionsRepository: Repository<MetaOption>,
+    private readonly metaOptionsRepository: Repository<MetaOption>, // not good, this is dirty
   ) {}
 
   public async create(@Body() createPostDto: CreatePostDto) {
-    let metaOptions = createPostDto.metaOptions
-      ? this.metaOptionsRepository.create(createPostDto.metaOptions)
-      : null;
-
-    if (metaOptions) {
-      await this.metaOptionsRepository.save(metaOptions);
-    }
+    // Before introducing CASCADE
+    // let metaOptions = createPostDto.metaOptions
+    //   ? this.metaOptionsRepository.create(createPostDto.metaOptions)
+    //   : null;
+    // if (metaOptions) {
+    //   await this.metaOptionsRepository.save(metaOptions);
+    // }
+    // let post = this.postsRepository.create(createPostDto);
+    // if (metaOptions) {
+    //   post.metaOptions = metaOptions;
+    // }
+    // return await this.postsRepository.save(post);
 
     let post = this.postsRepository.create(createPostDto);
-
-    if (metaOptions) {
-      post.metaOptions = metaOptions;
-    }
 
     return await this.postsRepository.save(post);
   }

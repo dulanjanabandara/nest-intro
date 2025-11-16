@@ -71,7 +71,13 @@ export class Post {
   })
   publishOn?: Date;
 
-  @OneToOne(() => MetaOption, { nullable: true })
+  // uni-directional one-to-one relationships
+  // @OneToOne(() => MetaOption, { nullable: true })
+  // @JoinColumn() // this will create the relationship column (metaOptionsId) in the post table
+  // metaOptions?: MetaOption | null;
+
+  // Addeing bi-directional one-to-one relationshis using CASCADE
+  @OneToOne(() => MetaOption, { cascade: true })
   @JoinColumn() // this will create the relationship column (metaOptionsId) in the post table
   metaOptions?: MetaOption | null;
 
