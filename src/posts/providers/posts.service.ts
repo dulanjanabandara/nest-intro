@@ -35,25 +35,25 @@ export class PostsService {
     return await this.postsRepository.save(post);
   }
 
-  public findAll(userId: string) {
-    const user = this.usersService.findOneById(userId);
+  public async findAll(userId: string) {
+    // const user = this.usersService.findOneById(userId);
 
-    return [
-      {
-        user: user,
-        title: 'Test title 1',
-        content: 'Test content 1',
-      },
-      {
-        user: user,
-        title: 'Test title 2',
-        content: 'Test content 2',
-      },
-      {
-        user: user,
-        title: 'Test title 3',
-        content: 'Test content 3',
-      },
-    ];
+    // Without eager loadings
+    // let posts = await this.postsRepository.find({
+    //   relations: { metaOptions: true },
+    // });
+
+    let posts = await this.postsRepository.find();
+    return posts;
+  }
+
+  public async delete(id: number) {
+    let post = await this.postsRepository.findOneBy({ id });
+    await this.postsRepository.delete(id);
+
+    if (post?.metaOptions) {
+      await this.metaOptionsRepository.delete(post.metaOptions.id);
+    }
+    return { deleted: true, id };
   }
 }
