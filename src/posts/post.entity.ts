@@ -77,7 +77,15 @@ export class Post {
   // metaOptions?: MetaOption | null;
 
   // Adding one-to-one relationshis using CASCADE
-  @OneToOne(() => MetaOption, { cascade: true, eager: true })
+  // @OneToOne(() => MetaOption, { cascade: true, eager: true })
+  // @JoinColumn() // this will create the relationship column (metaOptionsId) in the post table
+  // metaOptions?: MetaOption | null;
+
+  // Bi-directional one-to-one relationships
+  @OneToOne(() => MetaOption, (metaOptions) => metaOptions.post, {
+    cascade: true,
+    eager: true,
+  })
   @JoinColumn() // this will create the relationship column (metaOptionsId) in the post table
   metaOptions?: MetaOption | null;
 
