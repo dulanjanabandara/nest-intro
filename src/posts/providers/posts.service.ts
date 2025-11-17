@@ -12,8 +12,8 @@ export class PostsService {
     private readonly usersService: UsersService,
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
-    @InjectRepository(MetaOption)
-    private readonly metaOptionsRepository: Repository<MetaOption>, // not good, this is dirty
+    // @InjectRepository(MetaOption)
+    // private readonly metaOptionsRepository: Repository<MetaOption>, // not good, this is dirty
   ) {}
 
   public async create(@Body() createPostDto: CreatePostDto) {
@@ -30,8 +30,14 @@ export class PostsService {
     // }
     // return await this.postsRepository.save(post);
 
-    let post = this.postsRepository.create(createPostDto);
-
+    let author = await this.usersService.findOneById(createPostDto.authorId);
+    if (!author) {
+      throw new Error('Author not found');
+    }
+    let post = this.postsRepository.create({
+      ...createPostDto,
+      author: author,
+    });
     return await this.postsRepository.save(post);
   }
 

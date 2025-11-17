@@ -2,6 +2,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -9,6 +10,7 @@ import { postStatus } from './enums/postStatus.enum';
 import { CreatePostMetaOptionsDto } from '../meta-options/dtos/create-post-meta-options.dto';
 import { postType } from './enums/postType.enum';
 import { MetaOption } from 'src/meta-options/meta-option.entity';
+import { User } from 'src/users/user.entity';
 
 @Entity()
 export class Post {
@@ -92,6 +94,9 @@ export class Post {
   // We will remove this from here and put it on the MetaOption side as we are going to implement cascading delete and we want MetaOption to be the owner of the relationship, so that we can delete a post. Otherwise we have to first delete the metaOption reference from the post and then delete the post.
   // @JoinColumn()
   metaOptions?: MetaOption | null;
+
+  @ManyToOne(() => User, (user) => user.posts)
+  author: User;
 
   // Work on these later
   tags?: string[];
