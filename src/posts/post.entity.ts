@@ -86,7 +86,11 @@ export class Post {
     cascade: true,
     eager: true,
   })
-  @JoinColumn() // this will create the relationship column (metaOptionsId) in the post table
+  // this will create the relationship column (metaOptionsId) in the post table
+  // We will use @JoinColumn only on one side of the relationship
+  // We put it here on the Post side
+  // We will remove this from here and put it on the MetaOption side as we are going to implement cascading delete and we want MetaOption to be the owner of the relationship, so that we can delete a post. Otherwise we have to first delete the metaOption reference from the post and then delete the post.
+  // @JoinColumn()
   metaOptions?: MetaOption | null;
 
   // Work on these later

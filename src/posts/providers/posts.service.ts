@@ -48,23 +48,25 @@ export class PostsService {
   }
 
   public async delete(id: number) {
-    let post = await this.postsRepository.findOneBy({ id });
+    // let post = await this.postsRepository.findOneBy({ id });
     // await this.postsRepository.delete(id);
 
     // if (post?.metaOptions) {
     //   await this.metaOptionsRepository.delete(post.metaOptions.id);
     // }
 
-    let inversePost = await this.metaOptionsRepository.find({
-      where: { id: post?.metaOptions?.id },
-      relations: { post: true },
-    });
-    console.log(inversePost);
+    // Unnecessary code with CASCADE
+    // let inversePost = await this.metaOptionsRepository.find({
+    //   where: { id: post?.metaOptions?.id },
+    //   relations: { post: true },
+    // });
+    // console.log(inversePost);
 
-    for (let item of inversePost) {
-      console.log(item?.post?.metaOptions);
-    }
+    // for (let item of inversePost) {
+    //   console.log(item?.post?.metaOptions);
+    // }
 
+    await this.postsRepository.delete(id);
     return { deleted: true, id };
   }
 }
