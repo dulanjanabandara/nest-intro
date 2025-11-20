@@ -5,11 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Post } from '../post.entity';
 import { MetaOption } from 'src/meta-options/meta-option.entity';
+import { TagsService } from 'src/tags/providers/tags.service';
+import { PatchPostDto } from '../dtos/patch-post.dto';
 
 @Injectable()
 export class PostsService {
   constructor(
     private readonly usersService: UsersService,
+    private readonly tagsService: TagsService,
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
     // @InjectRepository(MetaOption)
@@ -34,9 +37,13 @@ export class PostsService {
     if (!author) {
       throw new Error('Author not found');
     }
+
+    let tags = await this.tagsService.findMultipeTags(createPostDto.tags || []);
+
     let post = this.postsRepository.create({
       ...createPostDto,
       author: author,
+      tags: tags,
     });
     return await this.postsRepository.save(post);
   }
@@ -46,11 +53,33 @@ export class PostsService {
 
     // Without eager loadings
     // let posts = await this.postsRepository.find({
-    //   relations: { metaOptions: true, author: true },
+    //   relations: { metaOptions: true, author: true, tags: true },
     // });
 
     let posts = await this.postsRepository.find();
     return posts;
+  }
+
+  public async update(patchPostDto: PatchPostDto) {
+    let tags = await this.tagsService.findMultipeTags(patchPostDto.tags || []);
+
+    let post = await this.postsRepository.findOneBy({
+      id: patchPostDto.id,
+    });
+
+    if (post) {
+      post.title = patchPostDto.title ?? post.title;
+      post.content = patchPostDto.content ?? post.content;
+      post.status = patchPostDto.status ?? post.status;
+      post.postType = patchPostDto.postType ?? post.postType;
+      post.slug = patchPostDto.slug ?? post.slug;
+      post.featuredImageUrl =
+        patchPostDto.featuredImageUrl ?? post.featuredImageUrl;
+      post.publishOn = patchPostDto.publishOn ?? post.publishOn;
+      post.tags = tags;
+
+      return await this.postsRepository.save(post);
+    }
   }
 
   public async delete(id: number) {

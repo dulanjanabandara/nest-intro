@@ -23,6 +23,7 @@ import { CreatePostMetaOptionsDto } from '../../meta-options/dtos/create-post-me
 // so the incoming request should contain all the properties and it should match all the validations you've added
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Tag } from 'src/tags/tag.entity';
 
 /**
  * Meta options
@@ -104,14 +105,16 @@ export class CreatePostDto {
   publishOn?: Date;
 
   @ApiPropertyOptional({
-    description: 'An array of tags passed as string values',
-    example: '["nestjs", "typescript"]',
+    // description: 'An array of tags passed as string values',
+    // example: '["nestjs", "typescript"]',
+    description: 'An array of ids of tags associated with the post',
+    example: '[1, 2]',
   })
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  @MinLength(3, { each: true })
-  tags?: string[];
+  @IsInt({ each: true })
+  // @MinLength(3, { each: true })
+  tags?: number[];
 
   // metaOptions?: [{ key: 'some-sidebarEnabled'; value: true }];
   // Old way //

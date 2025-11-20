@@ -2,6 +2,8 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -11,6 +13,7 @@ import { CreatePostMetaOptionsDto } from '../meta-options/dtos/create-post-meta-
 import { postType } from './enums/postType.enum';
 import { MetaOption } from 'src/meta-options/meta-option.entity';
 import { User } from 'src/users/user.entity';
+import { Tag } from 'src/tags/tag.entity';
 
 @Entity()
 export class Post {
@@ -98,6 +101,13 @@ export class Post {
   @ManyToOne(() => User, (user) => user.posts, { eager: true })
   author: User;
 
-  // Work on these later
-  tags?: string[];
+  // Uni-directional Many-to-many relationship with Tag entity
+  @ManyToMany(() => Tag, { eager: true })
+  // We put the JoinTable decorator only on one side of the relationship and it will create the junction table
+  // When we use JoinTable, TypeORM considers this side as the owning side of the relationship
+  // We put the JoinTable on the owning side of the relationship which is the Post entity in this case
+  // When we delete a post, the corresponding entries in the junction table will be deleted automatically, but the tags will remain in the Tag table
+  // This is cascade delete for many-to-many relationships
+  @JoinTable()
+  tags?: Tag[];
 }

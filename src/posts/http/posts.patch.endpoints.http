@@ -2,7 +2,10 @@ PATCH http://localhost:3000/posts
 Content-Type: application/json
 
 {
-  "id": 1234,
-  "postType": "page",
-  
+  "id": 6,
+  "title": "Updated Post Title 6 with typescript",
+  "postType": "post",
+  "status": "draft",
+  "content": "Test content",
+  "tags": [1, 2]  
 }
