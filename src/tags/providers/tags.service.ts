@@ -29,4 +29,9 @@ export class TagsService {
     await this.tagsRepository.delete(id);
     return { deleted: true, id };
   }
+
+  public async softDelete(id: number) {
+    await this.tagsRepository.softDelete(id); // this will create a deletedAt timestamp and will not actually delete the record from the database
+    return { deleted: true, id };
+  }
 }
