@@ -102,12 +102,17 @@ export class Post {
   author: User;
 
   // Uni-directional Many-to-many relationship with Tag entity
-  @ManyToMany(() => Tag, { eager: true })
-  // We put the JoinTable decorator only on one side of the relationship and it will create the junction table
-  // When we use JoinTable, TypeORM considers this side as the owning side of the relationship
-  // We put the JoinTable on the owning side of the relationship which is the Post entity in this case
-  // When we delete a post, the corresponding entries in the junction table will be deleted automatically, but the tags will remain in the Tag table
-  // This is cascade delete for many-to-many relationships
+  // @ManyToMany(() => Tag, { eager: true })
+  // // We put the JoinTable decorator only on one side of the relationship and it will create the junction table
+  // // When we use JoinTable, TypeORM considers this side as the owning side of the relationship
+  // // We put the JoinTable on the owning side of the relationship which is the Post entity in this case
+  // // When we delete a post, the corresponding entries in the junction table will be deleted automatically, but the tags will remain in the Tag table
+  // // This is cascade delete for many-to-many relationships
+  // @JoinTable()
+  // tags?: Tag[];
+
+  // Bi-directional Many-to-many relationship with Tag entity
+  @ManyToMany(() => Tag, (tag) => tag.posts, { eager: true })
   @JoinTable()
   tags?: Tag[];
 }
