@@ -1,4 +1,11 @@
-import { Body, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Injectable,
+  Logger,
+  Req,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { UsersService } from 'src/users/providers/users.service';
 import { CreatePostDto } from '../dtos/create-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,9 +14,12 @@ import { Post } from '../post.entity';
 import { MetaOption } from 'src/meta-options/meta-option.entity';
 import { TagsService } from 'src/tags/providers/tags.service';
 import { PatchPostDto } from '../dtos/patch-post.dto';
+import { Tag } from 'src/tags/tag.entity';
 
 @Injectable()
 export class PostsService {
+  private readonly logger = new Logger(PostsService.name);
+
   constructor(
     private readonly usersService: UsersService,
     private readonly tagsService: TagsService,
@@ -61,11 +71,40 @@ export class PostsService {
   }
 
   public async update(patchPostDto: PatchPostDto) {
-    let tags = await this.tagsService.findMultipeTags(patchPostDto.tags || []);
+    let tags: Tag[] | null;
+    let post: Post | null;
 
-    let post = await this.postsRepository.findOneBy({
-      id: patchPostDto.id,
-    });
+    try {
+      tags = await this.tagsService.findMultipeTags(patchPostDto.tags || []);
+    } catch (error) {
+      this.logger.error('Error fetching tags', error);
+
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment. Please try later.',
+      );
+    }
+
+    if (!tags || tags.length !== patchPostDto.tags?.length) {
+      throw new BadRequestException(
+        'Please check your tag Ids and ensure they are correct',
+      );
+    }
+
+    try {
+      post = await this.postsRepository.findOneBy({
+        id: patchPostDto.id,
+      });
+    } catch (error) {
+      this.logger.error('Error fetching tags', error);
+
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment. Please try later.',
+      );
+    }
+
+    if (!post) {
+      throw new BadRequestException('Post ID does not exist');
+    }
 
     if (post) {
       post.title = patchPostDto.title ?? post.title;
@@ -78,8 +117,16 @@ export class PostsService {
       post.publishOn = patchPostDto.publishOn ?? post.publishOn;
       post.tags = tags;
 
-      return await this.postsRepository.save(post);
+      try {
+        await this.postsRepository.save(post);
+      } catch (error) {
+        this.logger.error('Error updating post', error);
+        throw new RequestTimeoutException(
+          'Unable to process your request at the moment. Please try later.',
+        );
+      }
     }
+    return post;
   }
 
   public async delete(id: number) {
