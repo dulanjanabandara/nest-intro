@@ -13,6 +13,7 @@ import { MetaOptionsModule } from './meta-options/meta-options.module';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 // import { appConfig } from './config/app.config';
+import { PaginationModule } from './common/pagination/pagination.module';
 
 const ENV = process.env.NODE_ENV;
 @Module({
@@ -56,6 +57,7 @@ const ENV = process.env.NODE_ENV;
     }),
     TagsModule,
     MetaOptionsModule,
+    PaginationModule,
 
     // We'll convert this to async as we're planning to get these database configurations from an .env file.
     // TypeOrmModule.forRoot({

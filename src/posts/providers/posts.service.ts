@@ -16,6 +16,7 @@ import { TagsService } from 'src/tags/providers/tags.service';
 import { PatchPostDto } from '../dtos/patch-post.dto';
 import { Tag } from 'src/tags/tag.entity';
 import { GetPostsDto } from '../dtos/get-posts.dto';
+import { PaginationProvider } from 'src/common/pagination/providers/pagination.provider';
 
 @Injectable()
 export class PostsService {
@@ -24,6 +25,7 @@ export class PostsService {
   constructor(
     private readonly usersService: UsersService,
     private readonly tagsService: TagsService,
+    private readonly paginationProvider: PaginationProvider,
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
     // @InjectRepository(MetaOption)
@@ -68,13 +70,20 @@ export class PostsService {
     // });
 
     // Ensure defaults in case `limit` or `page` are undefined at runtime
-    const limit = postQuery.limit ?? 10;
-    const page = postQuery.page ?? 1;
+    // const limit = postQuery.limit ?? 10;
+    // const page = postQuery.page ?? 1;
 
-    const posts = await this.postsRepository.find({
-      take: limit,
-      skip: (page - 1) * limit,
-    });
+    // With pagination and eager loadings
+    // const posts = await this.postsRepository.find({
+    //   take: limit,
+    //   skip: (page - 1) * limit,
+    // });
+
+    // With the pagination provider
+    const posts = await this.paginationProvider.paginateQuery(
+      { limit: postQuery.limit, page: postQuery.page },
+      this.postsRepository,
+    );
 
     return posts;
   }
