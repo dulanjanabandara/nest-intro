@@ -24,6 +24,11 @@ async function bootstrap() {
       // What this does is, it will convert the primitive types to the types defined in the DTOs. For example, if a property is defined as number in the DTO, but comes as string in the request payload, it will be converted to number.
       // This will convert an incoming request to an instance of the DTO class after validation.
       transform: true,
+
+      // Enabling implicit conversion will allow class-transformer to automatically convert payloads to the expected types based on the type definitions in the DTOs without needing to use @Type decorators explicitly.
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   );
 

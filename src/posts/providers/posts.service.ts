@@ -15,6 +15,7 @@ import { MetaOption } from 'src/meta-options/meta-option.entity';
 import { TagsService } from 'src/tags/providers/tags.service';
 import { PatchPostDto } from '../dtos/patch-post.dto';
 import { Tag } from 'src/tags/tag.entity';
+import { GetPostsDto } from '../dtos/get-posts.dto';
 
 @Injectable()
 export class PostsService {
@@ -58,7 +59,7 @@ export class PostsService {
     return await this.postsRepository.save(post);
   }
 
-  public async findAll(userId: string) {
+  public async findAll(postQuery: GetPostsDto, userId: string) {
     // const user = this.usersService.findOneById(userId);
 
     // Without eager loadings
@@ -66,7 +67,15 @@ export class PostsService {
     //   relations: { metaOptions: true, author: true, tags: true },
     // });
 
-    let posts = await this.postsRepository.find();
+    // Ensure defaults in case `limit` or `page` are undefined at runtime
+    const limit = postQuery.limit ?? 10;
+    const page = postQuery.page ?? 1;
+
+    const posts = await this.postsRepository.find({
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
     return posts;
   }
 
