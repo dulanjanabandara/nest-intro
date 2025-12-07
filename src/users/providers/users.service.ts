@@ -14,6 +14,8 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { CreateUserProvider } from './create-user.provider';
+import { FindOneUserByEmailProvider } from './find-one-user-by-email.provider';
 /**
  * Class to connect to Users table and perform business operations
  */
@@ -37,47 +39,12 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
 
     private readonly configService: ConfigService,
+    private readonly createUserProvider: CreateUserProvider,
+    private readonly findOnebyEmailProvider: FindOneUserByEmailProvider,
   ) {}
 
   public async createUser(createUserDto: CreateUserDto) {
-    let existingUser: User | null = null;
-
-    try {
-      existingUser = await this.usersRepository.findOne({
-        where: { email: createUserDto.email },
-      });
-    } catch (error) {
-      this.logger.error('Error connecting to the database', error);
-      // Might save the details of the exception
-      throw new RequestTimeoutException(
-        'Unable to process your request at the moment. Please try later.',
-        {
-          description: 'Error connecting to the database',
-        },
-      );
-    }
-
-    if (existingUser) {
-      throw new BadRequestException('User already exists with this email.');
-    }
-
-    // No need of await keyword as this step does not save the item to the database. We can do any other operations here before storing the item to the database
-    let newUser = this.usersRepository.create(createUserDto);
-
-    try {
-      // saving to the database
-      newUser = await this.usersRepository.save(newUser);
-    } catch (error) {
-      this.logger.error('Error connecting to the database', error);
-      throw new RequestTimeoutException(
-        'Unable to process your request at the moment. Please try later.',
-        {
-          description: 'Error connecting to the database',
-        },
-      );
-    }
-
-    return newUser;
+    return this.createUserProvider.createUser(createUserDto);
   }
 
   /**
@@ -135,5 +102,9 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  public async findOneByEmail(email: string) {
+    return await this.findOnebyEmailProvider.findOneByEmail(email);
   }
 }
