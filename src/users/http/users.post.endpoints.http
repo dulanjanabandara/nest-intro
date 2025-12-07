@@ -7,3 +7,17 @@ Content-Type: application/json
   "email": "mark@cube.com",
   "password": "Pass123#"
 }
+
+POST http://localhost:3000/users/create-many
+Content-Type: application/json
+Authorization: Bearer code-here
+{
+  "users": [
+    {
+      "firstName": "Mark",
+      "lastName": "Cuban",
+      "email": "mark@cube.com",
+      "password": "Pass123#"
+    }
+  ]
+}
