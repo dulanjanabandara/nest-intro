@@ -13,6 +13,7 @@ import {
   ValidationPipe,
   Patch,
   UseGuards,
+  SetMetadata,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { GetUsersParamDto } from './dtos/get-users-param.dto';
@@ -22,6 +23,8 @@ import { UsersService } from './providers/users.service';
 // To group apis based on the modules - ApiTags
 import { ApiTags, ApiQuery, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AccessTokenGuard } from 'src/auth/guards/access-token/access-token.guard';
+import { Auth } from 'src/auth/decorators/auth.decorator';
+import { AuthType } from 'src/auth/enums/auth-type.enum';
 
 @Controller('users')
 // A swagger decorator - Swagger decorators can be used within DTOs, controllers and also controller methods
@@ -64,6 +67,8 @@ export class UsersController {
   }
 
   @Post()
+  // @SetMetadata('authType', 'None')
+  @Auth(AuthType.None)
   public createUser(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);
     // console.log(typeof createUserDto);
